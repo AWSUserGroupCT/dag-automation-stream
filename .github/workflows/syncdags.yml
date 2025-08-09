@@ -31,4 +31,4 @@ jobs:
 
       - name: Sync DAGs directory to S3
         run: |
-          aws s3 sync ./dag "s3://${S3_BUCKET}/" --delete
+          aws s3 sync ./dags "s3://${S3_BUCKET}/dags" --delete
