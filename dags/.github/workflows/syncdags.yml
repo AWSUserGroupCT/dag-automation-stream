@@ -1,0 +1,34 @@
+name: Sync DAGs to S3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dags/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write    # for OIDC
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  S3_BUCKET: s3-towncenter-dags
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::767398016864:role/DagRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync DAGs directory to S3
+        run: |
+          aws s3 sync ./dag "s3://${S3_BUCKET}/" --delete
